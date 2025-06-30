@@ -72,18 +72,26 @@ export type Piece = {
 
 type InternalMove = {
   color: Color;
-  from: number;
-  to: number;
+  from: Position;
+  to: Position;
   piece: PiecesSymbol;
   captured?: PiecesSymbol;
   promotion?: PiecesSymbol;
   flags: number;
 };
 
+type SelectPiece = {
+  color: Color;
+  from: Position;
+  piece: PiecesSymbol;
+};
+
+type Position = { x: number; y: number };
+
 export class Move {
   color: Color;
-  from: number;
-  to: number;
+  from: Position;
+  to: Position;
   piece: PiecesSymbol;
   captured?: PiecesSymbol;
   promotion?: PiecesSymbol;
@@ -112,9 +120,7 @@ export class Move {
   }
 
   validateMove(internalMove: InternalMove): boolean {
-    const newprice = this.moveHandler[internalMove.piece];
-
-    newprice();
+    return true;
   }
 
   pawnMove() {}
@@ -128,4 +134,10 @@ export class Move {
   bishopMove() {}
 
   queenMove() {}
+
+  getMovesByPiece(selectPiece: SelectPiece): Position[] {
+    const { color, piece, from } = selectPiece;
+
+    return [];
+  }
 }
