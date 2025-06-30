@@ -54,6 +54,25 @@ export function initializeBoard(): Board {
   ];
 }
 
+const pawnDir = {
+  w: -1,
+  b: 1,
+};
+
+const rookDir = [
+  { dx: 0, dy: -1 },
+  { dx: 0, dy: 1 },
+  { dx: -1, dy: 0 },
+  { dx: 1, dy: 0 },
+];
+
+const bishopDir = [
+  { dx: 1, dy: 1 },
+  { dx: 1, dy: -1 },
+  { dx: -1, dy: -1 },
+  { dx: -1, dy: 1 },
+];
+
 // prettier-ignore
 export type Square =
     'a8' | 'b8' | 'c8' | 'd8' | 'e8' | 'f8' | 'g8' | 'h8' |
