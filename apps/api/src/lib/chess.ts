@@ -1,4 +1,7 @@
-export class ChessHandler {}
+export class ChessHandler {
+  constructor() {}
+  move() {}
+}
 
 export type Color = 'w' | 'b';
 
@@ -12,18 +15,44 @@ export const ROOK = 'r';
 export const QUEEN = 'q';
 export const KING = 'k';
 
-export type Pieces = 'p' | 'n' | 'r' | 'q' | 'k' | 'b';
+type PiecesSymbol = 'p' | 'n' | 'r' | 'q' | 'k' | 'b';
 
-export const initialBoard: string[][] = [
-  ['r', 'n', 'b', 'q', 'k', 'b', 'n', 'r'],
-  ['p', 'p', 'p', 'p', 'p', 'p', 'p', 'p'],
-  ['', '', '', '', '', '', '', ''],
-  ['', '', '', '', '', '', '', ''],
-  ['', '', '', '', '', '', '', ''],
-  ['', '', '', '', '', '', '', ''],
-  ['P', 'P', 'P', 'P', 'P', 'P', 'P', 'P'],
-  ['R', 'N', 'B', 'Q', 'K', 'B', 'N', 'R'],
-];
+type Board = (Piece | null)[][];
+
+export function initializeBoard(): Board {
+  return [
+    [
+      { type: 'rook', color: 'black' },
+      { type: 'knight', color: 'black' },
+      { type: 'bishop', color: 'black' },
+      { type: 'queen', color: 'black' },
+      { type: 'king', color: 'black' },
+      { type: 'bishop', color: 'black' },
+      { type: 'knight', color: 'black' },
+      { type: 'rook', color: 'black' },
+    ],
+
+    Array(8).fill({ type: 'pawn', color: 'black' }),
+
+    Array(8).fill(null),
+    Array(8).fill(null),
+    Array(8).fill(null),
+    Array(8).fill(null),
+
+    Array(8).fill({ type: 'pawn', color: 'white' }),
+
+    [
+      { type: 'rook', color: 'white' },
+      { type: 'knight', color: 'white' },
+      { type: 'bishop', color: 'white' },
+      { type: 'queen', color: 'white' },
+      { type: 'king', color: 'white' },
+      { type: 'bishop', color: 'white' },
+      { type: 'knight', color: 'white' },
+      { type: 'rook', color: 'white' },
+    ],
+  ];
+}
 
 // prettier-ignore
 export type Square =
@@ -38,5 +67,39 @@ export type Square =
 
 export type Piece = {
   color: Color;
-  type: Pieces;
+  type: PiecesSymbol;
 };
+
+type InternalMove = {
+  color: Color;
+  from: number;
+  to: number;
+  piece: PiecesSymbol;
+  captured?: PiecesSymbol;
+  promotion?: PiecesSymbol;
+  flags: number;
+};
+
+export class Move {
+  color: Color;
+  from: number;
+  to: number;
+  piece: PiecesSymbol;
+  captured?: PiecesSymbol;
+  promotion?: PiecesSymbol;
+  flags: number;
+  board: Board;
+
+  constructor(board: Board, internalMove: InternalMove) {
+    const { color, flags, from, to, captured, promotion, piece } = internalMove;
+
+    this.board = board;
+    this.color = color;
+    this.to = to;
+    this.from = from;
+    this.piece = piece;
+    this.captured = captured;
+    this.promotion = promotion;
+    this.flags = flags;
+  }
+}
