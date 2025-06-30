@@ -153,12 +153,79 @@ export class Move {
   bishopMove() {}
 
   queenMove() {}
+}
 
-  getMovesByPiece(selectPiece: SelectPiece): Position[] {
-    const { color, piece, from } = selectPiece;
+export function getMovesByPiece(
+  board: Board,
+  selectPiece: SelectPiece,
+): Position[] {
+  const { color, piece, from } = selectPiece;
+  const { x, y } = from;
 
-    return [];
+  const moves: Position[] = [];
+
+  switch (piece) {
+    case 'p':
+      const startRow = color === 'w' ? 6 : 1;
+
+      const oneY = y + pawnDir[color];
+      if (isInside(x, oneY) && board[oneY][x] === null) {
+        moves.push({ x, y: oneY });
+
+        const twoY = y + pawnDir[color] * 2;
+        if (y === startRow && board[twoY][x] === null) {
+          moves.push({ x, y: twoY });
+        }
+      }
+
+      for (let dx of [-1, 1]) {
+        const cx = x + dx;
+        const cy = y + pawnDir[color];
+        if (isInside(cx, cy)) {
+          const target = board[cy][cx];
+          if (target && target.color !== color) {
+            moves.push({ x: cx, y: cy });
+          }
+        }
+      }
+
+      return moves;
+
+    case 'r':
+      for (const { dx, dy } of rookDir) {
+        let nx = x + dx;
+        let ny = y + dy;
+
+        while (isInside(nx, ny)) {
+          const target = board[ny][nx];
+          if (target === null) {
+            moves.push({ x: nx, y: ny });
+          } else {
+            if (target.color !== color) {
+              moves.push({ x: nx, y: ny });
+            }
+            break;
+          }
+
+          nx += dx;
+          ny += dy;
+        }
+      }
+
+      return moves;
+
+    case 'b':
+
+    default:
+      break;
   }
+
+  return [];
+}
+
+function isInside(x: number, y: number) {
+  return x >= 0 && x < 8 && y >= 0 && y < 8;
+}
 
 type BoardPosition = { x: number; y: number; notation: string };
 
