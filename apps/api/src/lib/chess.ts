@@ -89,6 +89,14 @@ export class Move {
   promotion?: PiecesSymbol;
   flags: number;
   board: Board;
+  moveHandler: Record<PiecesSymbol, () => void> = {
+    p: this.pawnMove,
+    n: this.knightMove,
+    r: this.rookMove,
+    q: this.queenMove,
+    k: this.kingMove,
+    b: this.bishopMove,
+  };
 
   constructor(board: Board, internalMove: InternalMove) {
     const { color, flags, from, to, captured, promotion, piece } = internalMove;
@@ -102,4 +110,22 @@ export class Move {
     this.promotion = promotion;
     this.flags = flags;
   }
+
+  validateMove(internalMove: InternalMove): boolean {
+    const newprice = this.moveHandler[internalMove.piece];
+
+    newprice();
+  }
+
+  pawnMove() {}
+
+  knightMove() {}
+
+  rookMove() {}
+
+  kingMove() {}
+
+  bishopMove() {}
+
+  queenMove() {}
 }
