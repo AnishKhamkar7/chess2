@@ -140,4 +140,96 @@ export class Move {
 
     return [];
   }
-}
+
+type BoardPosition = { x: number; y: number; notation: string };
+
+const positionBoard: BoardPosition[][] = [
+  [
+    // y = 0 → rank 8
+    { x: 0, y: 0, notation: 'a8' },
+    { x: 1, y: 0, notation: 'b8' },
+    { x: 2, y: 0, notation: 'c8' },
+    { x: 3, y: 0, notation: 'd8' },
+    { x: 4, y: 0, notation: 'e8' },
+    { x: 5, y: 0, notation: 'f8' },
+    { x: 6, y: 0, notation: 'g8' },
+    { x: 7, y: 0, notation: 'h8' },
+  ],
+  [
+    // y = 1 → rank 7
+    { x: 0, y: 1, notation: 'a7' },
+    { x: 1, y: 1, notation: 'b7' },
+    { x: 2, y: 1, notation: 'c7' },
+    { x: 3, y: 1, notation: 'd7' },
+    { x: 4, y: 1, notation: 'e7' },
+    { x: 5, y: 1, notation: 'f7' },
+    { x: 6, y: 1, notation: 'g7' },
+    { x: 7, y: 1, notation: 'h7' },
+  ],
+  [
+    // y = 2 → rank 6
+    { x: 0, y: 2, notation: 'a6' },
+    { x: 1, y: 2, notation: 'b6' },
+    { x: 2, y: 2, notation: 'c6' },
+    { x: 3, y: 2, notation: 'd6' },
+    { x: 4, y: 2, notation: 'e6' },
+    { x: 5, y: 2, notation: 'f6' },
+    { x: 6, y: 2, notation: 'g6' },
+    { x: 7, y: 2, notation: 'h6' },
+  ],
+  [
+    // y = 3 → rank 5
+    { x: 0, y: 3, notation: 'a5' },
+    { x: 1, y: 3, notation: 'b5' },
+    { x: 2, y: 3, notation: 'c5' },
+    { x: 3, y: 3, notation: 'd5' },
+    { x: 4, y: 3, notation: 'e5' },
+    { x: 5, y: 3, notation: 'f5' },
+    { x: 6, y: 3, notation: 'g5' },
+    { x: 7, y: 3, notation: 'h5' },
+  ],
+  [
+    // y = 4 → rank 4
+    { x: 0, y: 4, notation: 'a4' },
+    { x: 1, y: 4, notation: 'b4' },
+    { x: 2, y: 4, notation: 'c4' },
+    { x: 3, y: 4, notation: 'd4' },
+    { x: 4, y: 4, notation: 'e4' },
+    { x: 5, y: 4, notation: 'f4' },
+    { x: 6, y: 4, notation: 'g4' },
+    { x: 7, y: 4, notation: 'h4' },
+  ],
+  [
+    // y = 5 → rank 3
+    { x: 0, y: 5, notation: 'a3' },
+    { x: 1, y: 5, notation: 'b3' },
+    { x: 2, y: 5, notation: 'c3' },
+    { x: 3, y: 5, notation: 'd3' },
+    { x: 4, y: 5, notation: 'e3' },
+    { x: 5, y: 5, notation: 'f3' },
+    { x: 6, y: 5, notation: 'g3' },
+    { x: 7, y: 5, notation: 'h3' },
+  ],
+  [
+    // y = 6 → rank 2
+    { x: 0, y: 6, notation: 'a2' },
+    { x: 1, y: 6, notation: 'b2' },
+    { x: 2, y: 6, notation: 'c2' },
+    { x: 3, y: 6, notation: 'd2' },
+    { x: 4, y: 6, notation: 'e2' },
+    { x: 5, y: 6, notation: 'f2' },
+    { x: 6, y: 6, notation: 'g2' },
+    { x: 7, y: 6, notation: 'h2' },
+  ],
+  [
+    // y = 7 → rank 1
+    { x: 0, y: 7, notation: 'a1' },
+    { x: 1, y: 7, notation: 'b1' },
+    { x: 2, y: 7, notation: 'c1' },
+    { x: 3, y: 7, notation: 'd1' },
+    { x: 4, y: 7, notation: 'e1' },
+    { x: 5, y: 7, notation: 'f1' },
+    { x: 6, y: 7, notation: 'g1' },
+    { x: 7, y: 7, notation: 'h1' },
+  ],
+];
