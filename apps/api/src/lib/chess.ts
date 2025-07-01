@@ -200,10 +200,9 @@ export function getMovesByPiece(
           const target = board[ny][nx];
           if (target === null) {
             moves.push({ x: nx, y: ny });
+          } else if (target.color !== color) {
+            moves.push({ x: nx, y: ny });
           } else {
-            if (target.color !== color) {
-              moves.push({ x: nx, y: ny });
-            }
             break;
           }
 
@@ -215,6 +214,25 @@ export function getMovesByPiece(
       return moves;
 
     case 'b':
+      for (const { dx, dy } of bishopDir) {
+        let nx = x + dx;
+        let ny = y + dy;
+
+        while (isInside(nx, ny)) {
+          const target = board[ny][nx];
+
+          if (target === null) {
+            moves.push({ x: nx, y: ny });
+          } else if (target.color !== color) {
+            moves.push({ x: nx, y: ny });
+          } else break;
+
+          nx += dx;
+          ny += dy;
+        }
+      }
+
+      return moves;
 
     default:
       break;
