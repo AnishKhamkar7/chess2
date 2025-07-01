@@ -268,6 +268,30 @@ export function getMovesByPiece(
 
       return moves;
 
+    case 'q':
+      for (const { dx, dy } of queenDir) {
+        let nx = x + dx;
+        let ny = y + dy;
+
+        while (isInside(nx, ny)) {
+          const target = board[ny][nx];
+
+          if (target === null) {
+            moves.push({ x: nx, y: ny });
+          } else if (target.color !== color) {
+            moves.push({ x: nx, y: ny });
+          } else break;
+
+          nx += dx;
+          ny += dy;
+        }
+      }
+
+    case 'k':
+      for (const { dx, dy } of kingDir) {
+        let nx = x + dx;
+        let ny = y + dy;
+      }
     default:
       break;
   }
