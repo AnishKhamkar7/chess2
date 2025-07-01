@@ -127,7 +127,31 @@ type SelectPiece = {
   piece: PiecesSymbol;
 };
 
-type Position = { x: number; y: number };
+const Bits = {
+  NORMAL: 1,
+  CAPTURE: 2,
+  BIG_PAWN: 3,
+  EP_CAPTURE: 4,
+  PROMOTION: 5,
+  KSIDE_CASTLE: 6,
+  QSIDE_CASTLE: 7,
+  NULL_MOVE: 8,
+  CHECK: 9,
+} as const;
+
+type BitFlag = (typeof Bits)[keyof typeof Bits];
+
+type Position = {
+  x: number;
+  y: number;
+};
+
+type PiecePositions = {
+  target: null | { x1: number; y1: number; x2: number; y2: number };
+  x: number;
+  y: number;
+  flags: BitFlag;
+};
 
 export class Move {
   color: Color;
@@ -177,26 +201,15 @@ export class Move {
   queenMove() {}
 }
 
-const BITS: Record<string, number> = {
-  NORMAL: 1,
-  CAPTURE: 2,
-  BIG_PAWN: 3,
-  EP_CAPTURE: 4,
-  PROMOTION: 5,
-  KSIDE_CASTLE: 6,
-  QSIDE_CASTLE: 7,
-  NULL_MOVE: 8,
-  CHECK: 9,
-};
-
 export function getMovesByPiece(
   board: Board,
   selectPiece: SelectPiece,
-): Position[] {
+  isCheck: boolean,
+): PiecePositions[] {
   const { color, piece, from } = selectPiece;
   const { x, y } = from;
 
-  const moves: Position[] = [];
+  const moves: PiecePositions[] = [];
 
   switch (piece) {
     case 'p':
@@ -204,11 +217,11 @@ export function getMovesByPiece(
 
       const oneY = y + pawnDir[color];
       if (isInside(x, oneY) && board[oneY][x] === null) {
-        moves.push({ x, y: oneY });
+        moves.push({ x, y: oneY, target: null, flags: Bits.NORMAL });
 
         const twoY = y + pawnDir[color] * 2;
         if (y === startRow && board[twoY][x] === null) {
-          moves.push({ x, y: twoY });
+          moves.push({ x, y: twoY, target: null, flags: Bits.NORMAL });
         }
       }
 
@@ -218,7 +231,19 @@ export function getMovesByPiece(
         if (isInside(cx, cy)) {
           const target = board[cy][cx];
           if (target && target.color !== color) {
-            moves.push({ x: cx, y: cy });
+            target.type === 'k'
+              ? moves.push({
+                  x: cx,
+                  y: cy,
+                  target: { x1: x, y1: y, x2: cx, y2: cy },
+                  flags: Bits.CAPTURE,
+                })
+              : moves.push({
+                  x: cx,
+                  y: cy,
+                  target: { x1: x, y1: y, x2: cx, y2: cy },
+                  flags: Bits.CHECK,
+                });
           }
         }
       }
@@ -227,21 +252,33 @@ export function getMovesByPiece(
 
     case 'r':
       for (const { dx, dy } of rookDir) {
-        let nx = x + dx;
-        let ny = y + dy;
+        let cx = x + dx;
+        let cy = y + dy;
 
-        while (isInside(nx, ny)) {
-          const target = board[ny][nx];
+        while (isInside(cx, cy)) {
+          const target = board[cy][cx];
           if (target === null) {
-            moves.push({ x: nx, y: ny });
+            moves.push({ x: cx, y: cy, target: null, flags: Bits.NORMAL });
           } else if (target.color !== color) {
-            moves.push({ x: nx, y: ny });
+            target.type === 'k'
+              ? moves.push({
+                  x: cx,
+                  y: cy,
+                  target: { x1: x, y1: y, x2: cx, y2: cy },
+                  flags: Bits.CAPTURE,
+                })
+              : moves.push({
+                  x: cx,
+                  y: cy,
+                  target: { x1: x, y1: y, x2: cx, y2: cy },
+                  flags: Bits.CHECK,
+                });
           } else {
             break;
           }
 
-          nx += dx;
-          ny += dy;
+          cx += dx;
+          cy += dy;
         }
       }
 
@@ -249,20 +286,32 @@ export function getMovesByPiece(
 
     case 'b':
       for (const { dx, dy } of bishopDir) {
-        let nx = x + dx;
-        let ny = y + dy;
+        let cx = x + dx;
+        let cy = y + dy;
 
-        while (isInside(nx, ny)) {
-          const target = board[ny][nx];
+        while (isInside(cx, cy)) {
+          const target = board[cy][cx];
 
           if (target === null) {
-            moves.push({ x: nx, y: ny });
+            moves.push({ x: cx, y: cy, target: null, flags: Bits.NORMAL });
           } else if (target.color !== color) {
-            moves.push({ x: nx, y: ny });
+            target.type === 'k'
+              ? moves.push({
+                  x: cx,
+                  y: cy,
+                  target: { x1: x, y1: y, x2: cx, y2: cy },
+                  flags: Bits.CAPTURE,
+                })
+              : moves.push({
+                  x: cx,
+                  y: cy,
+                  target: { x1: x, y1: y, x2: cx, y2: cy },
+                  flags: Bits.CHECK,
+                });
           } else break;
 
-          nx += dx;
-          ny += dy;
+          cx += dx;
+          cy += dy;
         }
       }
 
@@ -270,27 +319,39 @@ export function getMovesByPiece(
 
     case 'q':
       for (const { dx, dy } of queenDir) {
-        let nx = x + dx;
-        let ny = y + dy;
+        let cx = x + dx;
+        let cy = y + dy;
 
-        while (isInside(nx, ny)) {
-          const target = board[ny][nx];
+        while (isInside(cx, cy)) {
+          const target = board[cy][cx];
 
           if (target === null) {
-            moves.push({ x: nx, y: ny });
+            moves.push({ x: cx, y: cy, target: null, flags: Bits.NORMAL });
           } else if (target.color !== color) {
-            moves.push({ x: nx, y: ny });
+            target.type === 'k'
+              ? moves.push({
+                  x: cx,
+                  y: cy,
+                  target: { x1: x, y1: y, x2: cx, y2: cy },
+                  flags: Bits.CAPTURE,
+                })
+              : moves.push({
+                  x: cx,
+                  y: cy,
+                  target: { x1: x, y1: y, x2: cx, y2: cy },
+                  flags: Bits.CHECK,
+                });
           } else break;
 
-          nx += dx;
-          ny += dy;
+          cx += dx;
+          cy += dy;
         }
       }
 
     case 'k':
       for (const { dx, dy } of kingDir) {
-        let nx = x + dx;
-        let ny = y + dy;
+        let cx = x + dx;
+        let cy = y + dy;
       }
     default:
       break;
