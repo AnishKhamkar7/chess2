@@ -155,6 +155,18 @@ export class Move {
   queenMove() {}
 }
 
+const BITS: Record<string, number> = {
+  NORMAL: 1,
+  CAPTURE: 2,
+  BIG_PAWN: 3,
+  EP_CAPTURE: 4,
+  PROMOTION: 5,
+  KSIDE_CASTLE: 6,
+  QSIDE_CASTLE: 7,
+  NULL_MOVE: 8,
+  CHECK: 9,
+};
+
 export function getMovesByPiece(
   board: Board,
   selectPiece: SelectPiece,
