@@ -242,7 +242,7 @@ export function getMovesByPiece(
         if (isInside(cx, cy)) {
           const target = board[cy][cx];
           if (target && target.color !== color) {
-            target.type === 'k'
+            target.type !== 'k'
               ? moves.push({
                   x: cx,
                   y: cy,
@@ -271,7 +271,7 @@ export function getMovesByPiece(
           if (target === null) {
             moves.push({ x: cx, y: cy, target: null, flags: Bits.NORMAL });
           } else if (target.color !== color) {
-            target.type === 'k'
+            target.type !== 'k'
               ? moves.push({
                   x: cx,
                   y: cy,
@@ -306,7 +306,7 @@ export function getMovesByPiece(
           if (target === null) {
             moves.push({ x: cx, y: cy, target: null, flags: Bits.NORMAL });
           } else if (target.color !== color) {
-            target.type === 'k'
+            target.type !== 'k'
               ? moves.push({
                   x: cx,
                   y: cy,
@@ -339,7 +339,7 @@ export function getMovesByPiece(
           if (target === null) {
             moves.push({ x: cx, y: cy, target: null, flags: Bits.NORMAL });
           } else if (target.color !== color) {
-            target.type === 'k'
+            target.type !== 'k'
               ? moves.push({
                   x: cx,
                   y: cy,
@@ -390,13 +390,19 @@ export function getMovesByPiece(
           if (target === null) {
             moves.push({ x: cx, y: cy, target: null, flags: Bits.NORMAL });
           } else if (target.color !== color) {
-            const flags = target.type === 'k' ? Bits.CHECK : Bits.CAPTURE;
-            moves.push({
-              x: cx,
-              y: cy,
-              target: { x1: x, y1: y, x2: cx, y2: cy },
-              flags,
-            });
+            target.type !== 'k'
+              ? moves.push({
+                  x: cx,
+                  y: cy,
+                  target: { x1: x, y1: y, x2: cx, y2: cy },
+                  flags: Bits.CAPTURE,
+                })
+              : moves.push({
+                  x: cx,
+                  y: cy,
+                  target: { x1: x, y1: y, x2: cx, y2: cy },
+                  flags: Bits.CHECK,
+                });
           }
         }
       }
