@@ -95,6 +95,17 @@ const kingDir = [
   { dx: 1, dy: 0 },
 ];
 
+const knightDir = [
+  { dx: 2, dy: 1 },
+  { dx: 2, dy: -1 },
+  { dx: -2, dy: 1 },
+  { dx: -2, dy: -1 },
+  { dx: 1, dy: 2 },
+  { dx: 1, dy: -2 },
+  { dx: -1, dy: 2 },
+  { dx: -1, dy: -2 },
+];
+
 // prettier-ignore
 export type Square =
     'a8' | 'b8' | 'c8' | 'd8' | 'e8' | 'f8' | 'g8' | 'h8' |
@@ -368,11 +379,33 @@ export function getMovesByPiece(
           }
         }
       }
+    case 'n':
+      for (const { dx, dy } of knightDir) {
+        const cx = x + dx;
+        const cy = y + dy;
+
+        if (isInside(cx, cy)) {
+          const target = board[cy][cx];
+
+          if (target === null) {
+            moves.push({ x: cx, y: cy, target: null, flags: Bits.NORMAL });
+          } else if (target.color !== color) {
+            const flags = target.type === 'k' ? Bits.CHECK : Bits.CAPTURE;
+            moves.push({
+              x: cx,
+              y: cy,
+              target: { x1: x, y1: y, x2: cx, y2: cy },
+              flags,
+            });
+          }
+        }
+      }
+      return moves;
     default:
       break;
   }
 
-  return [];
+  return moves;
 }
 
 function isInside(x: number, y: number) {
