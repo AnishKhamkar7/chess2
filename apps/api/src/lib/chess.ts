@@ -352,6 +352,21 @@ export function getMovesByPiece(
       for (const { dx, dy } of kingDir) {
         let cx = x + dx;
         let cy = y + dy;
+
+        while (isInside(cx, cy)) {
+          const target = board[cy][cx];
+
+          if (target === null) {
+            moves.push({ x: cx, y: cy, target: null, flags: Bits.NORMAL });
+          } else if (target.color !== color) {
+            moves.push({
+              x: cx,
+              y: cy,
+              target: { x1: x, y1: y, x2: cx, y2: cy },
+              flags: Bits.CAPTURE,
+            });
+          }
+        }
       }
     default:
       break;
