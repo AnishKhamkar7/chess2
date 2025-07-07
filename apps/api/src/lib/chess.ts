@@ -408,6 +408,33 @@ export function getMovesByPiece(
   return moves;
 }
 
+type Moves = { [key: string]: PiecePositions[] };
+
+export function getAllMovesByColor(board: Board, color: Color): Moves {
+  const allMoves: Moves = {};
+
+  for (let y = 0; y < 8; y++) {
+    for (let x = 0; x < 8; x++) {
+      const piece = board[y][x];
+
+      if (piece && piece.color === color) {
+        const selectPiece: SelectPiece = {
+          color: piece.color,
+          piece: piece.type,
+          from: { x, y },
+        };
+
+        const moves = getMovesByPiece(board, selectPiece, false);
+
+        if (moves.length > 0) {
+          allMoves[`${x},${y}`] = moves;
+        }
+      }
+    }
+  }
+  return allMoves;
+}
+
 function isInside(x: number, y: number) {
   return x >= 0 && x < 8 && y >= 0 && y < 8;
 }
