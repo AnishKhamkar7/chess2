@@ -350,10 +350,10 @@ export function getMovesByPiece(
 
     case 'k':
       for (const { dx, dy } of kingDir) {
-        let cx = x + dx;
-        let cy = y + dy;
+        const cx = x + dx;
+        const cy = y + dy;
 
-        while (isInside(cx, cy)) {
+        if (isInside(cx, cy)) {
           const target = board[cy][cx];
 
           if (target === null) {
