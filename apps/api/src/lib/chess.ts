@@ -354,11 +354,31 @@ export function getMovesByPiece(
       return moves;
 
     case 'b':
-      for (const { dx, dy } of bishopDir) {
+      for (const { dx, dy } of queenDir) {
         let cx = x + dx;
         let cy = y + dy;
+        let steps = 0;
+        let maxSteps = Infinity;
 
-        while (isInside(cx, cy)) {
+        const isDiagonal = Math.abs(dx) === Math.abs(dy);
+
+        if (isDiagonal) {
+          if (points > 0) {
+            if (points > 2 && points < 8) {
+              maxSteps = Math.abs(8 - points);
+            } else if (points >= 8) {
+              maxSteps = 1;
+            }
+          }
+        } else {
+          if (points < 0) {
+            maxSteps = Math.abs(points);
+          } else {
+            continue;
+          }
+        }
+
+        while (steps < maxSteps && isInside(cx, cy)) {
           const target = board[cy][cx];
 
           if (target === null) {
@@ -381,6 +401,7 @@ export function getMovesByPiece(
 
           cx += dx;
           cy += dy;
+          steps++;
         }
       }
 
