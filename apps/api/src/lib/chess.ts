@@ -130,7 +130,17 @@ type InternalMove = {
   captured?: PiecesSymbol;
   promotion?: PiecesSymbol;
   flags: number;
+  wPoints: number;
+  bPoints: number;
 };
+
+const Points = {
+  p: 1,
+  r: 3,
+  q: 5,
+  b: 2,
+  n: 2,
+} as const;
 
 type SelectPiece = {
   color: Color;
@@ -164,6 +174,8 @@ type PiecePositions = {
   flags: BitFlag;
 };
 
+type Moves = { [key: string]: PiecePositions[] };
+
 export class Move {
   color: Color;
   from: Position;
@@ -173,17 +185,21 @@ export class Move {
   promotion?: PiecesSymbol;
   flags: number;
   board: Board;
-  moveHandler: Record<PiecesSymbol, () => void> = {
-    p: this.pawnMove,
-    n: this.knightMove,
-    r: this.rookMove,
-    q: this.queenMove,
-    k: this.kingMove,
-    b: this.bishopMove,
-  };
+  wPoints: number;
+  bPoints: number;
 
   constructor(board: Board, internalMove: InternalMove) {
-    const { color, flags, from, to, captured, promotion, piece } = internalMove;
+    const {
+      color,
+      flags,
+      from,
+      to,
+      captured,
+      promotion,
+      piece,
+      bPoints,
+      wPoints,
+    } = internalMove;
 
     this.board = board;
     this.color = color;
@@ -193,29 +209,27 @@ export class Move {
     this.captured = captured;
     this.promotion = promotion;
     this.flags = flags;
+    this.bPoints = bPoints;
+    this.wPoints = wPoints;
+
+    //validate the moves here
   }
 
-  validateMove(internalMove: InternalMove): boolean {
+  move() {}
+
+  //not sure if this validation is necessary in the backend or not
+  //the legal moves are already being sent to the frontend
+  //validation can be done later
+
+  validateMove(internalMove: InternalMove, moves: Moves): boolean {
     return true;
   }
-
-  pawnMove() {}
-
-  knightMove() {}
-
-  rookMove() {}
-
-  kingMove() {}
-
-  bishopMove() {}
-
-  queenMove() {}
 }
 
 export function getMovesByPiece(
   board: Board,
   selectPiece: SelectPiece,
-  isCheck: boolean,
+  points: number,
 ): PiecePositions[] {
   const { color, piece, from } = selectPiece;
   const { x, y } = from;
@@ -259,6 +273,29 @@ export function getMovesByPiece(
         }
       }
 
+      if ((points > 4 && points >= 0) || points < -4 || points <= 0) {
+        const cx = x;
+        const cy = y + pawnDir[color];
+
+        if (isInside(cx, cy)) {
+          const target = board[cy][cx];
+          if (target && target.color !== color) {
+            target.type !== 'k'
+              ? moves.push({
+                  x: cx,
+                  y: cy,
+                  target: { x1: x, y1: y, x2: cx, y2: cy },
+                  flags: Bits.CAPTURE,
+                })
+              : moves.push({
+                  x: cx,
+                  y: cy,
+                  target: { x1: x, y1: y, x2: cx, y2: cy },
+                  flags: Bits.CHECK,
+                });
+          }
+        }
+      }
       return moves;
 
     case 'r':
@@ -413,8 +450,6 @@ export function getMovesByPiece(
 
   return moves;
 }
-
-type Moves = { [key: string]: PiecePositions[] };
 
 export function getAllMovesByColor(board: Board, color: Color): Moves {
   const allMoves: Moves = {};
