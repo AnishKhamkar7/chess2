@@ -1,8 +1,3 @@
-export class ChessHandler {
-  constructor() {}
-  move() {}
-}
-
 export type Color = 'w' | 'b';
 
 export const WHITE = 'w';
@@ -244,9 +239,12 @@ export function getMovesByPiece(
       if (isInside(x, oneY) && board[oneY][x] === null) {
         moves.push({ x, y: oneY, target: null, flags: Bits.NORMAL });
 
-        const twoY = y + pawnDir[color] * 2;
-        if (y === startRow && board[twoY][x] === null) {
-          moves.push({ x, y: twoY, target: null, flags: Bits.NORMAL });
+        //after 5 points starting pawns cant get a head start
+        if (points < 4) {
+          const twoY = y + pawnDir[color] * 2;
+          if (y === startRow && board[twoY][x] === null) {
+            moves.push({ x, y: twoY, target: null, flags: Bits.NORMAL });
+          }
         }
       }
 
@@ -273,7 +271,8 @@ export function getMovesByPiece(
         }
       }
 
-      if ((points > 4 && points >= 0) || points < -4 || points <= 0) {
+      //pawns can attack straight when they are 6 points down
+      if (points < -5) {
         const cx = x;
         const cy = y + pawnDir[color];
 
@@ -296,6 +295,7 @@ export function getMovesByPiece(
           }
         }
       }
+
       return moves;
 
     case 'r':
