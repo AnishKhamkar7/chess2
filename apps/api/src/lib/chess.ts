@@ -299,11 +299,31 @@ export function getMovesByPiece(
       return moves;
 
     case 'r':
-      for (const { dx, dy } of rookDir) {
+      for (const { dx, dy } of queenDir) {
+        let steps = 0;
+        let maxSteps = Infinity;
+        const isDiagonal = Math.abs(dx) === Math.abs(dy);
+
+        if (isDiagonal) {
+          if (points < 0) {
+            maxSteps = Math.abs(points);
+          } else {
+            continue;
+          }
+        } else {
+          if (points > 0) {
+            if (points > 2 && points < 8) {
+              maxSteps = Math.abs(8 - points);
+            } else if (points >= 8) {
+              maxSteps = 1;
+            }
+          }
+        }
+
         let cx = x + dx;
         let cy = y + dy;
 
-        while (isInside(cx, cy)) {
+        while (steps < maxSteps && isInside(cx, cy)) {
           const target = board[cy][cx];
           if (target === null) {
             moves.push({ x: cx, y: cy, target: null, flags: Bits.NORMAL });
@@ -327,6 +347,7 @@ export function getMovesByPiece(
 
           cx += dx;
           cy += dy;
+          steps++;
         }
       }
 
@@ -451,7 +472,11 @@ export function getMovesByPiece(
   return moves;
 }
 
-export function getAllMovesByColor(board: Board, color: Color): Moves {
+export function getAllMovesByColor(
+  board: Board,
+  color: Color,
+  points: number,
+): Moves {
   const allMoves: Moves = {};
 
   for (let y = 0; y < 8; y++) {
@@ -465,7 +490,7 @@ export function getAllMovesByColor(board: Board, color: Color): Moves {
           from: { x, y },
         };
 
-        const moves = getMovesByPiece(board, selectPiece, false);
+        const moves = getMovesByPiece(board, selectPiece, points);
 
         if (moves.length > 0) {
           allMoves[`${x},${y}`] = moves;
